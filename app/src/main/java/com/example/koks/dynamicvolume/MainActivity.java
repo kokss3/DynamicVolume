@@ -12,11 +12,7 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-    private Button Plus, Minus, Next, Prev, Play;
     long eventtime = SystemClock.uptimeMillis();
-
-    public MainActivity(){
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -30,11 +26,11 @@ public class MainActivity extends AppCompatActivity {
         startService(new Intent(this, IbusService.class));
 
         final AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        Plus = findViewById(R.id.Plus);
-        Minus = findViewById(R.id.Minus);
-        Next = findViewById(R.id.Next);
-        Prev = findViewById(R.id.Prev);
-        Play = findViewById(R.id.Play);
+        final Button Plus = findViewById(R.id.Plus);
+        final Button Minus = findViewById(R.id.Minus);
+        final Button Next = findViewById(R.id.Next);
+        final Button Prev = findViewById(R.id.Prev);
+        final Button Play = findViewById(R.id.Play);
 
         Plus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,72 +52,45 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-            if(audioManager.isMusicActive()){
-                Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
-
-                KeyEvent downEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PAUSE, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-                sendOrderedBroadcast(upIntent,null);
-
-                KeyEvent upEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PAUSE, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
-                sendOrderedBroadcast(upIntent,null);
-
-                Play.setText("Pause");
+                if(audioManager.isMusicActive()){
+                    buttonClick( KeyEvent.KEYCODE_MEDIA_PLAY);
+                    Play.setText(getString(R.string.play));
 
                 }else {
-                Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
-
-                KeyEvent downEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-                sendOrderedBroadcast(upIntent,null);
-
-                KeyEvent upEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
-                sendOrderedBroadcast(upIntent,null);
-
-                Play.setText("Play");
+                    buttonClick(KeyEvent.KEYCODE_MEDIA_PLAY);
+                    Play.setText(getString(R.string.pause));
                 }
             }
 
         });
 
-
         Next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
-                KeyEvent downEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-                sendOrderedBroadcast(upIntent,null);
-
-                KeyEvent upEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
-                sendOrderedBroadcast(upIntent,null);
+                buttonClick(KeyEvent.KEYCODE_MEDIA_NEXT);
             }
         });
 
         Prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
-
-                KeyEvent downEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-                sendOrderedBroadcast(upIntent,null);
-
-                KeyEvent upEvent = new KeyEvent(eventtime, eventtime,
-                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PREVIOUS, 0);
-                upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
-                sendOrderedBroadcast(upIntent,null);
+                buttonClick(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
             }
         });
+
+    }
+
+    private void buttonClick(int keyEvent){
+        Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
+
+        KeyEvent downEvent = new KeyEvent(eventtime, eventtime,
+                KeyEvent.ACTION_DOWN, keyEvent, 0);
+        upIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
+        sendOrderedBroadcast(upIntent,null);
+
+        KeyEvent upEvent = new KeyEvent(eventtime, eventtime,
+                KeyEvent.ACTION_UP, keyEvent, 0);
+        upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
+        sendOrderedBroadcast(upIntent,null);
     }
 }

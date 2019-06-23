@@ -12,7 +12,8 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-    long eventtime = SystemClock.uptimeMillis();
+    private long eventime = SystemClock.uptimeMillis();
+    private AudioManager audioManager;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         startService(new Intent(this, IbusService.class));
 
-        final AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         final Button Plus = findViewById(R.id.Plus);
         final Button Minus = findViewById(R.id.Minus);
         final Button Next = findViewById(R.id.Next);
@@ -51,11 +52,9 @@ public class MainActivity extends AppCompatActivity {
         Play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(audioManager.isMusicActive()){
                     buttonClick( KeyEvent.KEYCODE_MEDIA_PLAY);
                     Play.setText(getString(R.string.play));
-
                 }else {
                     buttonClick(KeyEvent.KEYCODE_MEDIA_PLAY);
                     Play.setText(getString(R.string.pause));
@@ -77,20 +76,12 @@ public class MainActivity extends AppCompatActivity {
                 buttonClick(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
             }
         });
-
     }
 
     private void buttonClick(int keyEvent){
-        Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null);
-
-        KeyEvent downEvent = new KeyEvent(eventtime, eventtime,
-                KeyEvent.ACTION_DOWN, keyEvent, 0);
-        upIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-        sendOrderedBroadcast(upIntent,null);
-
-        KeyEvent upEvent = new KeyEvent(eventtime, eventtime,
-                KeyEvent.ACTION_UP, keyEvent, 0);
-        upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
-        sendOrderedBroadcast(upIntent,null);
+        audioManager.dispatchMediaKeyEvent(
+                new KeyEvent(eventime, eventime, KeyEvent.ACTION_DOWN, keyEvent,0));
+        audioManager.dispatchMediaKeyEvent(
+                new KeyEvent(eventime, eventime, KeyEvent.ACTION_UP, keyEvent,0));
     }
 }

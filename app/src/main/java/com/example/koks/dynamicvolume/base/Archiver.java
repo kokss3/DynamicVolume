@@ -16,7 +16,9 @@ public class Archiver extends SQLiteOpenHelper {
     private final static String ID = "id";
     private final static int VERSION = 1;
 
-    private static final String EXEC_NAME = "create table " + DATABASE_NAME + " ( "+ ID + " int(10) primary key autoincrement, "+ DATABASE_MESSAGE + " varchar(255))";
+    private static final String EXEC_NAME = String.format(
+            "create table %s(%s int(10) primary key autoincrement, %s varchar(255));",
+            DATABASE_NAME, ID, DATABASE_MESSAGE);
 
     public Archiver(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
@@ -42,9 +44,11 @@ public class Archiver extends SQLiteOpenHelper {
     public List<String> getAllMessages(){
         List<String> messages = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cd = db.rawQuery("select " + DATABASE_MESSAGE + " from " + DATABASE_NAME,null);
+        Cursor cd = db.rawQuery(String.format("select %s from %s", DATABASE_MESSAGE, DATABASE_NAME),
+                null);
 
-        if(cd!=null) while (cd.moveToNext())messages.add(cd.getString(cd.getColumnIndex(DATABASE_MESSAGE)));
+        if(cd!=null) while (cd.moveToNext())
+            messages.add(cd.getString(cd.getColumnIndex(DATABASE_MESSAGE)));
         assert cd != null;
         cd.close();
         return messages;
@@ -53,9 +57,11 @@ public class Archiver extends SQLiteOpenHelper {
     public String getMessage(int id){
         String message = "";
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cd = db.rawQuery("select "+DATABASE_MESSAGE+" from "+DATABASE_NAME+" where "+ID+"=?", new String[] {String.valueOf(id)} );
+        Cursor cd = db.rawQuery(String.format("select %s from %s where %s=%s",
+                DATABASE_MESSAGE, DATABASE_NAME, ID, String.valueOf(id)), null );
 
-        if(cd!=null) while (cd.moveToNext())message=cd.getString(cd.getColumnIndex(DATABASE_MESSAGE));
+        if(cd!=null) while (cd.moveToNext())
+            message=cd.getString(cd.getColumnIndex(DATABASE_MESSAGE));
         assert cd != null;
         cd.close();
         return message;
